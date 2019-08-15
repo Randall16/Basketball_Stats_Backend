@@ -11,11 +11,11 @@ _URL = 'https://www.basketball-reference.com/players/%c/'
 _ALPHABET = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
     'q','r','s','t','u','v','w','x','y','z')
 
-def get_players(letters: ()=_ALPHABET) -> ():
+def get_players(letters: ()=_ALPHABET, sleep_time: int=0) -> ():
     players = []  
     for letter in letters:
-        time.sleep(2)
-        html = get_players_html(letter)
+        time.sleep(sleep_time)
+        html = get_players_html(letter.lower())
         parsed_players = parse_player_table_html(html)
 
         if parsed_players != None:

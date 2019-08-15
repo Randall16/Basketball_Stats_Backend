@@ -15,8 +15,20 @@ cursor = mydb.cursor()
 
 SQL_INSERT_PLAYER_TABLE = '''INSERT INTO player_table (player_id, name,
     year_from, year_to, position, height, weight, birthdate, colleges, hall_of_fame) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    year_from = VALUES(year_from),
+    year_to = VALUES(year_to),
+    position = VALUES(position),
+    height = VALUES(height),
+    weight = VALUES(weight),
+    birthdate = VALUES(birthdate),
+    colleges = VALUES(colleges),
+    hall_of_fame = VALUES(hall_of_fame)'''
 
+
+# TODO handle on duplicate key insert case
 SQL_INSERT_SEASON_TABLE = '''INSERT INTO season_table (player_id, year, 
     playoffs, team, age, games_played, games_started, minutes, field_goals_made,
     field_goals_attempted, threes_made, threes_attempted, twos_made,

@@ -7,12 +7,11 @@ from models import *
 from database import *
 
 
-for i in range(1990, 1980, -1):
-    time.sleep(14)
+for i in range(1980, 1979, -1):
+    time.sleep(2)
     seasons = get_player_seasons(i, False)
     cursor.executemany(SQL_INSERT_SEASON_TABLE, seasons)
     mydb.commit()
     print('%d year successfully inserted' % i)
-
 
 mydb.close()
