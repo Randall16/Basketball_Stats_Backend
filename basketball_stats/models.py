@@ -45,6 +45,7 @@ class PlayerSeasonTotals(typing.NamedTuple):
 
 class PlayerSeasonPerGame(typing.NamedTuple):
 
+    player_id: str
     year: str
     playoffs: bool
     team: str
@@ -67,6 +68,7 @@ class PlayerSeasonPerGame(typing.NamedTuple):
 
     @classmethod
     def from_season_totals(cls, season_totals: PlayerSeasonTotals):
+        player_id = season_totals.player_id
         year = season_totals.year
         playoffs = season_totals.playoffs
         team = season_totals.team
@@ -159,7 +161,7 @@ class PlayerSeasonPerGame(typing.NamedTuple):
             points = season_totals.points / season_totals.games_played
             points = round(points, 1)
 
-        return cls(year, playoffs, team, age, games_played, games_started,
+        return cls(player_id, year, playoffs, team, age, games_played, games_started,
                 minutes, field_goal_percentage, three_percentage, free_throw_percentage,
                 offensive_rebounds, defensive_rebounds, total_rebounds, assists,
                 steals, blocks, turnovers, personal_fouls, points)
