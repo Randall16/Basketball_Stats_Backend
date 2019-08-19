@@ -19,7 +19,7 @@ class Player:
         self.season_averages = list(filter(lambda season: season.playoffs == 0, all_averages))
         self.playoff_averages = list(filter(lambda season: season.playoffs == 1, all_averages))
     
-    def to_json(self, print_pretty: bool=False):
+    def to_json(self, print_pretty: bool=False) -> str:
         json_data = {}
         
         json_data = self.player_info._asdict()

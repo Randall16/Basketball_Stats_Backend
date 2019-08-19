@@ -5,6 +5,7 @@ from parse_players import get_players
 
 from models import *
 from database import *
+from player import Player
 
 ''' Use this file to run sample queries against db '''
 
@@ -19,15 +20,11 @@ sql_query = ''' SELECT %s
                 FROM season_table
                 INNER JOIN player_table 
                 ON season_table.player_id = player_table.player_id
-                WHERE player_table.name = \'%s\' '''
+                WHERE player_table.name = \'%s\'
+                ORDER BY year'''
 
-#print(sql_query % (cols, 'Larry Bird'))
-cursor.execute(sql_query % (cols, 'Michael Jordan'))
-seasons = [ PlayerSeasonTotals(*i) for i in cursor.fetchall() ]
+db = get_local_database()
 
-for i in seasons:
-    dc = i._asdict()
-    del dc['player_id']
-    dc['tes'] = None
-    js = json.dumps(dc, default=str)
-    print(js)
+
+player = get_player_by_id(db, 'simmojo02')
+print(player.to_json())
