@@ -14,6 +14,14 @@ def get_local_database() -> mysql.connector.connection.MySQLConnection:
         database=LOCAL_DATABASE
     )
 
+def get_aws_database() -> mysql.connector.connection.MySQLConnection:
+    return mysql.connector.connect (
+        host=AWS_HOST,
+        user=AWS_USER,
+        password=AWS_PASSWORD,
+        database=AWS_DATABASE
+    )
+
 def get_player_info_by_id(database: mysql.connector.connection.MySQLConnection,
     player_id: str) -> PlayerInfo:
 

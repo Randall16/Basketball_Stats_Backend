@@ -2,3 +2,4 @@ env
 __pycache__
 .vscode
 db_config.py
+/lambda_layer
