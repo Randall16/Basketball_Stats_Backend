@@ -22,6 +22,28 @@ def get_aws_database() -> mysql.connector.connection.MySQLConnection:
         database=AWS_DATABASE
     )
 
+def get_all_players_info(database: mysql.connector.connection.MySQLConnection) -> []:
+
+    cursor = database.cursor()
+
+    cursor.execute(SQL_QUERY_GET_ALL_PLAYERS_INFO)
+    db_response = cursor.fetchall()
+
+    if db_response == None:
+        return None
+    
+    players_info = [PlayerInfo(*info) for info in db_response]
+    return players_info
+
+def get_all_player_ids(database: mysql.connector.connection.MySQLConnection) -> []:
+
+    cursor = database.cursor()
+
+    cursor.execute(SQL_QUERY_GET_ALL_PLAYER_IDS)
+    db_response = cursor.fetchall()
+    
+    return db_response
+
 def get_player_info_by_id(database: mysql.connector.connection.MySQLConnection,
     player_id: str) -> PlayerInfo:
 

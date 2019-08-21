@@ -58,6 +58,8 @@ SQL_QUERY_GET_PLAYER_SEASONS_BY_ID = '''SELECT *
 
 SQL_QUERY_GET_ALL_PLAYER_IDS = 'SELECT player_id FROM player_table'
 
+SQL_QUERY_GET_ALL_PLAYERS_INFO = 'SELECT * FROM player_table'
+
 SQL_SEASON_TABLE_COLUMNS = '''season_table.player_id, year, 
     playoffs, team, age, games_played, games_started, minutes, field_goals_made,
     field_goals_attempted, threes_made, threes_attempted, twos_made,
