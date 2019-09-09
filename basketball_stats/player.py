@@ -24,6 +24,9 @@ class Player:
 
         json_data = self.player_info._asdict()
 
+        # convert to boolean
+        json_data['hall_of_fame'] = bool(json_data['hall_of_fame'])
+
         json_data['regular_season_stats'] = [season.__dict__ for season in self.regular_season_stats]
         json_data['playoff_stats'] = [season.__dict__ for season in self.playoff_stats]
 

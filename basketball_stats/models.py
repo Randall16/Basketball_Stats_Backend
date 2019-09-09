@@ -184,14 +184,14 @@ class PlayerSeason():
                 self.free_throw_percentage = round(self.free_throw_percentage, 3)
 
         if (season_totals.field_goals_attempted != None and season_totals.field_goals_made != None
-            and season_totals.threes_made != None):
+            and season_totals.threes_made != None and season_totals.field_goals_attempted != 0):
             # using eFG% formula
             self.effective_field_goal_percentage = ((season_totals.field_goals_made
                 + 0.5 * season_totals.threes_made) / season_totals.field_goals_attempted)
             self.effective_field_goal_percentage = round(self.effective_field_goal_percentage, 3)
 
         if (season_totals.points != None and season_totals.free_throws_attempted != None
-            and season_totals.field_goals_attempted != None):
+            and season_totals.field_goals_attempted != None and season_totals.free_throws_attempted != 0):
             # using true shooting formula
             self.true_shooting_percentage = (season_totals.points / (2 * (
                 season_totals.field_goals_attempted + 0.44 * season_totals.free_throws_attempted)))

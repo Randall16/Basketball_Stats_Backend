@@ -11,7 +11,7 @@ from player import Player
 
 
 db = get_local_database()
-player = get_player_by_id(db, 'leonaka01')
+player = get_player_by_id(db, 'westje01')
 
 
 print(player.to_json())
