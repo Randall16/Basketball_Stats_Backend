@@ -86,9 +86,13 @@ def get_player_by_id(database: mysql.connector.connection.MySQLConnection,
     player_id: str) -> Player:
 
     player_info = get_player_info_by_id(database, player_id)
+
+    if player_info == None:
+        return None
+
     player_seasons = get_player_season_totals_by_id(database, player_id)
 
-    if player_info == None or player_seasons == None:
+    if player_seasons == None:
         return None
-    else:
-        return Player(player_info, player_seasons)
+
+    return Player(player_info, player_seasons)

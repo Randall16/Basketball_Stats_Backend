@@ -10,11 +10,8 @@ from player import Player
 ''' Use this file to run sample queries against db '''
 
 
-db = get_aws_database()
+db = get_local_database()
+player = get_player_by_id(db, 'leonaka01')
 
 
-info_list = get_all_players_info(db)
-
-li = [i._asdict() for i in info_list]
-
-print(json.dumps(li, default=str))
+print(player.to_json())
