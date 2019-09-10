@@ -18,6 +18,10 @@ class Player:
             elif season.playoffs == 1:
                 self.playoff_stats.append(all_stats)
 
+        # sort season by year then by total_games_played
+        self.regular_season_stats.sort(key=lambda season: (season.year, season.total_games_played))
+        self.playoff_stats.sort(key=lambda season: (season.year, season.total_games_played))
+
 
     def to_json(self, print_pretty: bool=False):
         json_data = {}
