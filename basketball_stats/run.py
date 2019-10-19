@@ -1,5 +1,6 @@
 import mysql.connector
 import json
+import time
 from parse_player_season import get_player_seasons
 from parse_players import get_players
 
@@ -11,7 +12,5 @@ from player import Player
 
 
 db = get_local_database()
-player = get_player_by_id(db, 'harrito02')
 
-
-print(player.to_json())
+update_database_by_season(db, 2019)

@@ -1,5 +1,8 @@
 import mysql.connector
+import time
 
+from parse_player_season import get_player_seasons
+from parse_players import get_players
 from player import Player
 from models import *
 from sql_statements import *
@@ -40,7 +43,8 @@ def get_all_player_ids(database: mysql.connector.connection.MySQLConnection) -> 
     cursor = database.cursor()
 
     cursor.execute(SQL_QUERY_GET_ALL_PLAYER_IDS)
-    db_response = cursor.fetchall()
+
+    db_response = [i[0] for i in cursor.fetchall()]
     
     return db_response
 
@@ -96,3 +100,38 @@ def get_player_by_id(database: mysql.connector.connection.MySQLConnection,
         return None
 
     return Player(player_info, player_seasons)
+
+def update_database_by_season(database: mysql.connector.connection.MySQLConnection,
+    year: int, sleep_interval: int=0):
+
+    cursor = database.cursor()
+    player_ids = get_all_player_ids(database)
+    known_ids = set()
+
+    for i in player_ids:
+        known_ids.add(i)
+
+    seasons = get_player_seasons(year)
+
+    # add any unknown players into the players table
+    for season in seasons:
+        if season.player_id not in known_ids:
+            player_infos = get_players(season.player_id[0])
+
+            cursor.executemany(SQL_INSERT_PLAYER_TABLE, player_infos)
+            database.commit()
+
+            for player in player_infos:
+                known_ids.add(player.player_id)
+
+            time.sleep(2)
+
+    # add seasons
+    for season in seasons:
+        if season.player_id in known_ids:
+            cursor.execute(SQL_INSERT_SEASON_TABLE, season)
+        else:
+            print('Unable to add player %s does not exist in players table' % season.player_id)
+
+    database.commit()
+    
