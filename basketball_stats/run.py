@@ -32,7 +32,6 @@ item = table.get_item(
 )
 item = item['Item']
 print(item)
-#print('college is ', item['college'])
 
 del item[SORT_KEY]
 pinfo = PlayerInfo(**item)
