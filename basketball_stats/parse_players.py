@@ -11,7 +11,7 @@ _URL = 'https://www.basketball-reference.com/players/%c/'
 _ALPHABET = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
     'q','r','s','t','u','v','w','x','y','z')
 
-def get_players(letters: ()=_ALPHABET, sleep_time: int=0) -> ():
+def get_players(letters: ()=_ALPHABET, sleep_time: int=0) -> []:
     players = []  
     for letter in letters:
         time.sleep(sleep_time)
@@ -21,7 +21,7 @@ def get_players(letters: ()=_ALPHABET, sleep_time: int=0) -> ():
         if parsed_players != None:
             players.extend(parsed_players)
     
-    return tuple(players)
+    return players
 
 def get_players_html(letter: str) -> BeautifulSoup:
     req = requests.get(_URL % letter)

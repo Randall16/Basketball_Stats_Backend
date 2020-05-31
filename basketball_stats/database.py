@@ -9,7 +9,7 @@ from sql_statements import *
 from db_config import *
 
 
-def get_local_database() -> mysql.connector.connection.MySQLConnection
+def get_local_database() -> mysql.connector.connection.MySQLConnection:
     # some comment
     return mysql.connector.connect (
         host=LOCAL_HOST,
