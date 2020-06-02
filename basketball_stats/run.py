@@ -23,11 +23,13 @@ db = session.resource('dynamodb')
 table = db.Table('basketball_archive')
 
 
-update_player_info_by_letter('b', table)
+#update_player_info_by_letter('a', table)
+update_players_seasons_by_year(table, 2019)
+
 item = table.get_item(
     Key={
-        PRIMARY_KEY: 'abrinal01',
-        SORT_KEY: 'info'
+        PRIMARY_KEY: 'aytonde01',
+        SORT_KEY: SORT_KEY_INFO_INDICATOR
     }
 )
 item = item['Item']
