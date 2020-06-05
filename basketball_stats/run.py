@@ -1,10 +1,15 @@
 
 
 import boto3
+from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.types import Decimal
+
 import credentials
 
 from dynamo_database import *
 from models import *
+from player import Player
+import json
 
 ''' Use this file to run sample queries against db '''
 
@@ -23,20 +28,9 @@ db = session.resource('dynamodb')
 table = db.Table('basketball_archive')
 
 
-#update_player_info_by_letter('a', table)
-update_players_seasons_by_year(table, 2019)
 
-item = table.get_item(
-    Key={
-        PRIMARY_KEY: 'aytonde01',
-        SORT_KEY: SORT_KEY_INFO_INDICATOR
-    }
-)
-item = item['Item']
-print(item)
+ayton = get_player_by_id(table, 'aytonde01')
+print(ayton.to_json(True))
 
-del item[SORT_KEY]
-pinfo = PlayerInfo(**item)
-print(pinfo.colleges)
 
-#table.delete()
+table.delete()

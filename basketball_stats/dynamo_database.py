@@ -1,9 +1,13 @@
 
 import boto3
+from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.types import Decimal
 
 import credentials
 from parse_players_infos import get_players_infos
 from parse_players_seasons import get_players_seasons
+from player import Player
+from models import PlayerInfo, PlayerSeasonTotals
 
 
 PRIMARY_KEY = 'player_id'
@@ -51,7 +55,7 @@ def create_basketball_archive_database(db_resource):
     )
 
 
-def update_player_info_by_letter(letter: chr, table):
+def update_player_info_by_letter(table, letter: chr):
     player_infos = get_players_infos((letter,))
 
     with table.batch_writer() as batch: 
@@ -114,9 +118,58 @@ def update_players_seasons_by_year(table, year: int, playoffs: bool=False):
 
 
 def generate_player_season_sort_key(year: int, team: str, playoffs: bool) -> str:
-    season_type = 'REGULAR_'
+    season_type = 'REGULAR'
     if playoffs:
-        season_type = 'PLAYOFF_'
+        season_type = 'PLAYOFF'
 
-    return season_type + SORT_KEY_SEASON_INDICATOR + '#' + str(year) + '#' + team
+    return SORT_KEY_SEASON_INDICATOR + '#' + season_type + str(year) + '#' + team
+
+def get_player_info_by_id(table, player_id: str) -> PlayerInfo:
+
+    player_info = table.get_item(
+        Key={
+            PRIMARY_KEY: player_id,
+            SORT_KEY: SORT_KEY_INFO_INDICATOR
+        }
+    )
+
+    player_info = player_info['Item']
+
+    # Deleting sort key because we want to convert this into our Python 
+    # PlayerInfo object
+    del player_info[SORT_KEY]
+
+    return PlayerInfo(**player_info)
+
+def get_player_seasons_by_id(table, player_id: str) -> []:
+
+    seasons = table.query(
+        KeyConditionExpression=Key(PRIMARY_KEY).eq(player_id)
+            & Key(SORT_KEY).begins_with(SORT_KEY_SEASON_INDICATOR)
+    )
+
+    seasons = seasons['Items']
+    
+    season_objects = []
+    for season in seasons:
+
+        # Deleting sort key because we want to convert this into our Python 
+        # PlayerSeasonTotals object
+        del season[SORT_KEY]
+
+        # DynamoDB has some obscure custom object for storing any numerical
+        # value. The for loop below converts that type into standard python ints.
+        for k, v in season.items():
+            if isinstance(v, Decimal):
+                season[k] = int(v)
+
+        season_objects.append(PlayerSeasonTotals(**season))
+
+    return season_objects
+
+def get_player_by_id(table, player_id: str) -> Player:
+    player_info = get_player_info_by_id(table, player_id)
+    seasons = get_player_seasons_by_id(table, player_id)
+
+    return Player(player_info, seasons)
         

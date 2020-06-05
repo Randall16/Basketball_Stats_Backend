@@ -13,9 +13,9 @@ class Player:
         # divide the seasons into regular seasons and playoffs
         for season in all_seasons_totals:
             all_stats = PlayerSeason(season)
-            if season.playoffs == 0:
+            if season.playoffs == False:
                 self.regular_season_stats.append(all_stats)
-            elif season.playoffs == 1:
+            elif season.playoffs == True:
                 self.playoff_stats.append(all_stats)
 
         # sort season by year then by total_games_played
