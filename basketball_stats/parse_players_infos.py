@@ -12,9 +12,15 @@ _ALPHABET = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
     'q','r','s','t','u','v','w','x','y','z')
 
 def get_players_infos(letters: ()=_ALPHABET, sleep_time: int=0) -> []:
-    players = []  
+    players = [] 
+
+    first_loop = True 
     for letter in letters:
-        time.sleep(sleep_time)
+
+        if not first_loop:
+            time.sleep(sleep_time)
+            first_loop = False
+            
         html = get_players_infos_html(letter.lower())
         parsed_players = parse_players_infos_table_html(html)
 

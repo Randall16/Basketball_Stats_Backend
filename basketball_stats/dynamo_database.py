@@ -10,12 +10,12 @@ from player import Player
 from models import PlayerInfo, PlayerSeasonTotals
 
 
-TABLE_NAME = 'basketball_archive'
-PRIMARY_KEY = 'player_id'
-SORT_KEY = 'player_data_type'
+TABLE_NAME = 'basketball_archive2'
+PRIMARY_KEY = 'data_type'
+SORT_KEY = 'id'
 
-SORT_KEY_INFO_INDICATOR = 'INFO'
-SORT_KEY_SEASON_INDICATOR = 'SEASON'
+DATA_TYPE_INDICATOR_INFO = 'INFO'
+DATA_TYPE_INDICATOR_SEASON = 'SEASON'
 
 PLAYER_INFO_ENTITY_ATTRIBUTES = (PRIMARY_KEY, SORT_KEY, 'name', 'year_from',
     'year_to', 'position', 'height', 'weight', 'birthdate', 'colleges', 'hall_of_fame')
@@ -31,7 +31,7 @@ PLAYER_SEASON_ENTITY_ATTRIBUTES = (PRIMARY_KEY, SORT_KEY, 'year', 'playoffs',
 def create_basketball_archive_database(db_resource):
     """ Creates the DynamoDB table from AWS Dynamo Resource """
     db_resource.create_table(
-        TableName='basketball_archive',
+        TableName=TABLE_NAME,
         KeySchema=[
             {
                 'AttributeName': PRIMARY_KEY,
@@ -65,9 +65,9 @@ def update_player_info_by_letters(table, letters: tuple):
             # Inserting into dynamo table takes a dictionary, player_info_values
             # will be the values portion of that dictionary
             player_info_values = list(player_info)
-            # Need to add the SORT_KEY_INFO_INDICATOR because that is not part
-            # of the player info object
-            player_info_values.insert(1, SORT_KEY_INFO_INDICATOR)
+            # Need to add the DATA_TYPE_INDICATOR_INFO because that is not part
+            # of the PlayerInfo object
+            player_info_values.insert(0, DATA_TYPE_INDICATOR_INFO)
 
             # Now create the dictionary by zipping the PLAYER_INFO_ENTITY_ATTRIBUTES
             # as the keys with the values created above
@@ -81,8 +81,8 @@ def update_players_seasons_by_year(table, year: int, playoffs: bool=False):
 
     players_seasons = get_players_seasons(year, playoffs)
 
-    known_player_ids = get_all_player_ids_that_have_info(table)
-    letters_to_update = set()
+    #known_player_ids = get_all_player_ids_that_have_info(table)
+    #letters_to_update = set()
 
     with table.batch_writer() as batch: 
         for player_season in players_seasons:
@@ -92,11 +92,8 @@ def update_players_seasons_by_year(table, year: int, playoffs: bool=False):
             player_season_values = list(player_season)
 
 
-            sort_key_value = generate_player_season_sort_key(player_season.year, 
-                player_season.team, player_season.playoffs)
-
-            # Add the sort_key_value to the values list created above
-            player_season_values.insert(1, sort_key_value)
+            # Add the DATA_TYPE_INDICATOR_SEASON to the values list created above
+            player_season_values.insert(0, DATA_TYPE_INDICATOR_SEASON)
 
             # Now create the dictionary by zipping the 
             # PLAYER_SEASON_ENTITY_ATTRIBUTES as the keys with the values created above
@@ -104,13 +101,13 @@ def update_players_seasons_by_year(table, year: int, playoffs: bool=False):
 
             batch.put_item(Item=item)
 
-            if player_season.player_id not in known_player_ids:
+    """ if player_season.player_id not in known_player_ids:
                 letters_to_update.add(player_season.player_id[0])
     
-    update_player_info_by_letters(table, tuple(letters_to_update))
+    update_player_info_by_letters(table, tuple(letters_to_update)) """
 
 
-def generate_player_season_sort_key(year: int, team: str, playoffs: bool) -> str:
+""" def generate_player_season_sort_key(year: int, team: str, playoffs: bool) -> str:
     season_type = 'REGULAR'
     if playoffs:
         season_type = 'PLAYOFF'
@@ -118,7 +115,7 @@ def generate_player_season_sort_key(year: int, team: str, playoffs: bool) -> str
     key = (SORT_KEY_SEASON_INDICATOR + '_' + season_type + '_' + str(year)
         +  '_' + team)
 
-    return key
+    return key """
 
 
 def get_player_info_by_id(table, player_id: str) -> PlayerInfo:
