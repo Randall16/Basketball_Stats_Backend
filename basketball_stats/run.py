@@ -11,6 +11,8 @@ from models import *
 from player import Player
 import json
 
+import time
+
 ''' Use this file to run sample queries against db '''
 
 
@@ -23,14 +25,27 @@ session = boto3.Session(
 db = session.resource('dynamodb')
 
 
-#create_basketball_archive_database(db)
+# create_basketball_archive_database(db)
 
-table = db.Table('basketball_archive')
-
-
-
-ayton = get_player_by_id(table, 'aytonde01')
-print(ayton.to_json(True))
+table = db.Table(TABLE_NAME)
 
 
-table.delete()
+
+""" for i in range(1952, 1980):
+    update_players_seasons_by_year(table, i, False)
+    time.sleep(10) """
+
+#update_players_seasons_by_year(table, 1970)
+
+ayton_id = 'aytonde01'
+bam_id = 'adebaba01'
+giannis_id = 'antetgi01'
+west_id = 'westje01'
+
+#player = get_player_by_id(table, west_id)
+#print(player.to_json())
+
+#print(len(get_all_player_infos(table)))
+print(len(get_all_player_ids_that_have_info(table)))
+
+#table.delete()

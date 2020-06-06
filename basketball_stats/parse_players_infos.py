@@ -62,8 +62,8 @@ def parse_players_infos_table_html(table: BeautifulSoup) -> []:
         cols = row.find_all('td')
 
         # extract remaining data
-        year_from = cols[0].text
-        year_to = cols[1].text
+        year_from = int(cols[0].text)
+        year_to = int(cols[1].text)
         position = cols[2].text
         height = _convert_to_inches(cols[3].text)
         weight = None
