@@ -10,6 +10,7 @@ from sql_statements import *
 mydb = get_local_database()
 cursor = mydb.cursor()
 
+
 for i in range(1960, 1949, -1):
     seasons = get_player_seasons(i, True)
     cursor.executemany(SQL_INSERT_SEASON_TABLE, seasons)
