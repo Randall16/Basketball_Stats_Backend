@@ -12,8 +12,9 @@ from models import PlayerInfo, PlayerSeasonTotals
 
 TABLE_NAME = 'basketball_archive'
 PRIMARY_KEY = 'player_id'
-SORT_KEY = 'player_data_type'
+SORT_KEY = 'data_type'
 
+DATA_TYPE_INDEX = 'data_type_index'
 SORT_KEY_INFO_INDICATOR = 'INFO'
 SORT_KEY_SEASON_INDICATOR = 'SEASON'
 
@@ -25,13 +26,21 @@ PLAYER_SEASON_ENTITY_ATTRIBUTES = (PRIMARY_KEY, SORT_KEY, 'year', 'playoffs',
     'field_goals_attempted', 'threes_made', 'threes_attempted', 'twos_made', 
     'twos_attempted', 'free_throws_made', 'free_throws_attempted',
     'offensive_rebounds', 'defensive_rebounds', 'total_rebounds', 'assists',
-    'steals', 'blocks', 'turnovers', 'personal_fouls', 'points' )
+    'steals', 'blocks', 'turnovers', 'personal_fouls', 'points')
 
 
 def create_basketball_archive_database(db_resource):
     """ Creates the DynamoDB table from AWS Dynamo Resource """
+
+    # project all attributes minus the sort key
+    nonKeyAttributes = list(filter(
+        lambda attribute: attribute != SORT_KEY,
+        PLAYER_INFO_ENTITY_ATTRIBUTES
+    ))
+
+
     db_resource.create_table(
-        TableName='basketball_archive',
+        TableName=TABLE_NAME,
         KeySchema=[
             {
                 'AttributeName': PRIMARY_KEY,
@@ -51,6 +60,21 @@ def create_basketball_archive_database(db_resource):
                 'AttributeName': SORT_KEY,
                 'AttributeType': 'S'
             },
+        ],
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': DATA_TYPE_INDEX,
+                'KeySchema': [
+                    {
+                        'AttributeName': SORT_KEY,
+                        'KeyType': 'HASH'
+                    }
+                ],
+                'Projection': {
+                    'ProjectionType': 'INCLUDE',
+                    'NonKeyAttributes': nonKeyAttributes
+                }
+            }  
         ],
         BillingMode='PAY_PER_REQUEST'
     )
@@ -172,8 +196,9 @@ def get_player_by_id(table, player_id: str) -> Player:
 
 def get_all_player_infos(table) -> []:
     
-    player_infos = table.scan(
-        FilterExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR)
+    player_infos = table.query(
+        IndexName=DATA_TYPE_INDEX,
+        KeyConditionExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR)
     )
 
     player_infos = player_infos['Items']
@@ -207,16 +232,17 @@ def get_all_player_ids_that_have_info(table):
     
     player_ids = set()
 
-    response = table.scan(
+    response = table.query(
+        IndexName=DATA_TYPE_INDEX,
         ProjectionExpression=PRIMARY_KEY,
-        FilterExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR),
+        KeyConditionExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR)
     ) 
 
     for pair in response.get('Items', []):
         player_ids.add(pair[PRIMARY_KEY])
 
 
-    while 'LastEvaluatedKey' in response:
+    """while 'LastEvaluatedKey' in response:
         response = table.scan(
             ProjectionExpression=PRIMARY_KEY,
             FilterExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR),
@@ -224,7 +250,7 @@ def get_all_player_ids_that_have_info(table):
         )
 
         for pair in response.get('Items', []):
-            player_ids.add(pair[PRIMARY_KEY])
+            player_ids.add(pair[PRIMARY_KEY])"""
             
      
 
