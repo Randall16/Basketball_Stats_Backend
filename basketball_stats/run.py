@@ -29,7 +29,6 @@ db = session.resource('dynamodb')
 
 table = db.Table(TABLE_NAME)
 
-
 ayton_id = 'aytonde01'
 bam_id = 'adebaba01'
 giannis_id = 'antetgi01'
@@ -37,8 +36,11 @@ west_id = 'westje01'
 beal_id = 'bealbr01'
 
 
-player = get_player_by_id(table, west_id)
-print(player.to_json(False))
+""" player = get_player_by_id(table, ayton_id)
+
+d = { 'body': player.to_json(False) }
+print(d) """
+print(get_all_player_infos(table))
 
 #print(len(get_all_player_infos(table)))
 #print(len(get_all_player_ids_that_have_info(table)))
