@@ -34,11 +34,8 @@ west_id = 'westje01'
 beal_id = 'bealbr01'
 
 
-""" player = get_player_by_id(table, ayton_id)
-
-d = { 'body': player.to_json(False) }
-print(d) """
-print(get_all_player_infos(table))
+player = get_player_by_id(table, giannis_id)
+print(player.to_json(True))
 
 #print(len(get_all_player_infos(table)))
 #print(len(get_all_player_ids_that_have_info(table)))
