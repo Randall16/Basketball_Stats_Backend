@@ -6,13 +6,13 @@ from models import *
 _URL = 'https://www.basketball-reference.com/leagues/NBA_%d_totals.html'
 _PLAYOFF_URL = 'https://www.basketball-reference.com/playoffs/NBA_%d_totals.html'
 
-def get_player_seasons(year: int, playoffs: bool=False) -> ():
-    html = get_player_seasons_html(year, playoffs)
-    season_list = parse_player_season_html(html, year, playoffs)
-    return tuple(season_list)
+def get_players_seasons(year: int, playoffs: bool=False) -> []:
+    html = get_players_seasons_html(year, playoffs)
+    season_list = parse_players_seasons_html(html, year, playoffs)
+    return season_list
 
 
-def get_player_seasons_html(year: int, playoffs: bool) -> BeautifulSoup:
+def get_players_seasons_html(year: int, playoffs: bool) -> BeautifulSoup:
     """ Fetches player season totals html table from Basketball Reference """
     url = _PLAYOFF_URL if playoffs else _URL
 
@@ -27,7 +27,7 @@ def get_player_seasons_html(year: int, playoffs: bool) -> BeautifulSoup:
     table_body = table.find('tbody')
     return table_body
 
-def parse_player_season_html(table: BeautifulSoup, year: int, playoffs: bool=False) -> []:
+def parse_players_seasons_html(table: BeautifulSoup, year: int, playoffs: bool=False) -> []:
 
     if table == None:
         return None

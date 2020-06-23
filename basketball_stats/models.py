@@ -4,8 +4,8 @@ class PlayerInfo(typing.NamedTuple):
 
     player_id: str
     name: str
-    year_from: str
-    year_to: str
+    year_from: int
+    year_to: int
     position: str
     height: int
     weight: int

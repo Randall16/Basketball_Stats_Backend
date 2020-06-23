@@ -11,19 +11,19 @@ _URL = 'https://www.basketball-reference.com/players/%c/'
 _ALPHABET = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
     'q','r','s','t','u','v','w','x','y','z')
 
-def get_players(letters: ()=_ALPHABET, sleep_time: int=0) -> ():
+def get_players_infos(letters: ()=_ALPHABET, sleep_time: int=0) -> []:
     players = []  
     for letter in letters:
         time.sleep(sleep_time)
-        html = get_players_html(letter.lower())
-        parsed_players = parse_player_table_html(html)
+        html = get_players_infos_html(letter.lower())
+        parsed_players = parse_players_infos_table_html(html)
 
         if parsed_players != None:
             players.extend(parsed_players)
     
-    return tuple(players)
+    return players
 
-def get_players_html(letter: str) -> BeautifulSoup:
+def get_players_infos_html(letter: str) -> BeautifulSoup:
     req = requests.get(_URL % letter)
 
     if req.status_code != 200:
@@ -35,7 +35,7 @@ def get_players_html(letter: str) -> BeautifulSoup:
     table_body = table.find('tbody')
     return table_body
 
-def parse_player_table_html(table: BeautifulSoup) -> []:
+def parse_players_infos_table_html(table: BeautifulSoup) -> []:
 
     if table == None:
         return None
@@ -62,8 +62,8 @@ def parse_player_table_html(table: BeautifulSoup) -> []:
         cols = row.find_all('td')
 
         # extract remaining data
-        year_from = cols[0].text
-        year_to = cols[1].text
+        year_from = int(cols[0].text)
+        year_to = int(cols[1].text)
         position = cols[2].text
         height = _convert_to_inches(cols[3].text)
         weight = None

@@ -2,4 +2,5 @@ env
 __pycache__
 .vscode
 db_config.py
+credentials.py
 /lambda_layer
