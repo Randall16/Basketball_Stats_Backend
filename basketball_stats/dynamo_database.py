@@ -102,6 +102,8 @@ def update_player_info_by_letters(table, letters: tuple):
 
 
 def update_players_seasons_by_year(table, year: int, playoffs: bool=False):
+    """ Will update all season stats for that year. If a player season is found
+    and their info is missing. It will update for that letter group as well. """
 
     players_seasons = get_players_seasons(year, playoffs)
 
@@ -135,6 +137,7 @@ def update_players_seasons_by_year(table, year: int, playoffs: bool=False):
 
 
 def generate_player_season_sort_key(year: int, team: str, playoffs: bool) -> str:
+    """ Build the sort key """
     season_type = 'REGULAR'
     if playoffs:
         season_type = 'PLAYOFF'
@@ -146,6 +149,7 @@ def generate_player_season_sort_key(year: int, team: str, playoffs: bool) -> str
 
 
 def get_player_info_by_id(table, player_id: str) -> PlayerInfo:
+    """ Returns player info from given """
 
     player_info = table.get_item(
         Key={
@@ -160,11 +164,13 @@ def get_player_info_by_id(table, player_id: str) -> PlayerInfo:
     # PlayerInfo object
     del player_info[SORT_KEY]
     player_info = _convert_to_ints(player_info)
-
+        
+    # using ** to unpack into PlayerSeasonTotals
     return PlayerInfo(**player_info)
 
 
 def get_player_seasons_by_id(table, player_id: str) -> []:
+    """ Returns all player season objects from given id """
 
     seasons = table.query(
         KeyConditionExpression=Key(PRIMARY_KEY).eq(player_id)
@@ -175,34 +181,58 @@ def get_player_seasons_by_id(table, player_id: str) -> []:
     
     season_objects = []
     for season in seasons:
-
         # Deleting sort key because we want to convert this into our Python 
         # PlayerSeasonTotals object
         del season[SORT_KEY]
 
         season = _convert_to_ints(season)
 
+        # using ** to unpack into PlayerSeasonTotals
         season_objects.append(PlayerSeasonTotals(**season))
 
     return season_objects
 
 
 def get_player_by_id(table, player_id: str) -> Player:
-    player_info = get_player_info_by_id(table, player_id)
-    seasons = get_player_seasons_by_id(table, player_id)
+    """ Returns player object based on player_id """
+  
+    # Get all player items that match that id
+    items = table.query(KeyConditionExpression=Key(PRIMARY_KEY).eq(player_id))
 
-    return Player(player_info, seasons)
+    # The info we care about is nested inside Items key
+    items = items['Items']
+    season_objects = []
+    player_info = None
+
+    for item in items:
+        if item[SORT_KEY].startswith(SORT_KEY_SEASON_INDICATOR):
+            # Deleting sort key because we want to convert this into our Python 
+            # PlayerSeasonTotals object
+            del item[SORT_KEY]
+            season = _convert_to_ints(item) # converting to standard python ints
+            # using ** to unpack into PlayerSeasonTotals
+            season_objects.append(PlayerSeasonTotals(**season))
+        elif item[SORT_KEY] == SORT_KEY_INFO_INDICATOR:
+            # Deleting sort key because we want to convert this into our Python 
+            # PlayerInfo object
+            del item[SORT_KEY]
+            player_info = _convert_to_ints(item)
+            player_info = PlayerInfo(**player_info)
+
+    # Return the Player object
+    return Player(player_info, season_objects)
 
 
 def get_all_player_infos(table) -> []:
+    """ Gets all player_infos from the table """
     
     player_infos = table.query(
         IndexName=DATA_TYPE_INDEX,
         KeyConditionExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR)
     )
 
+    # actual results is nested inside of Items key
     player_infos = player_infos['Items']
-
 
     player_info_objects = []
     for player_info in player_infos:
@@ -226,9 +256,8 @@ def _convert_to_ints(dictionary: {}) -> {}:
     return dictionary
 
 
-
-
 def get_all_player_ids_that_have_info(table):
+    """ Returns a set of player_ids that have there Info in the table """
     
     player_ids = set()
 
@@ -240,18 +269,5 @@ def get_all_player_ids_that_have_info(table):
 
     for pair in response.get('Items', []):
         player_ids.add(pair[PRIMARY_KEY])
-
-
-    """while 'LastEvaluatedKey' in response:
-        response = table.scan(
-            ProjectionExpression=PRIMARY_KEY,
-            FilterExpression=Key(SORT_KEY).eq(SORT_KEY_INFO_INDICATOR),
-            ExclusiveStartKey=response['LastEvaluatedKey']
-        )
-
-        for pair in response.get('Items', []):
-            player_ids.add(pair[PRIMARY_KEY])"""
-            
-     
 
     return player_ids
